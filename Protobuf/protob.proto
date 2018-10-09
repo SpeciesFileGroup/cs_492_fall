@@ -8,9 +8,14 @@ message Version {
 
 message Void {}
 
-message WithText {
-    bool value = 1;
+message Title {
+    int32 id = 1;
+    string archive_id = 2;
+    string path = 3;
+    string lang = 4;
 }
+
+message TitlesOpt {}
 
 message Page {
     string id = 1;
@@ -20,6 +25,12 @@ message Page {
     string title_path = 5;
     repeated NameString names = 6;
 }
+
+message PagesOpt {
+    bool with_text = 1;
+    repeated int32 title_ids = 2;
+}
+
 
 message NameString {
     string value = 1;
@@ -44,5 +55,6 @@ enum MatchType {
 
 service BHLIndex {
     rpc Ver(Void) returns(Version) {}
-    rpc Pages(WithText) returns(stream Page) {}
+    rpc Pages(PagesOpt) returns(stream Page) {}
+    rpc Titles(TitlesOpt) returns(stream Title) {}
 }

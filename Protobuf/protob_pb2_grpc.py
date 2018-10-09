@@ -21,8 +21,13 @@ class BHLIndexStub(object):
         )
     self.Pages = channel.unary_stream(
         '/protob.BHLIndex/Pages',
-        request_serializer=protob__pb2.WithText.SerializeToString,
+        request_serializer=protob__pb2.PagesOpt.SerializeToString,
         response_deserializer=protob__pb2.Page.FromString,
+        )
+    self.Titles = channel.unary_stream(
+        '/protob.BHLIndex/Titles',
+        request_serializer=protob__pb2.TitlesOpt.SerializeToString,
+        response_deserializer=protob__pb2.Title.FromString,
         )
 
 
@@ -44,6 +49,13 @@ class BHLIndexServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
+  def Titles(self, request, context):
+    # missing associated documentation comment in .proto file
+    pass
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
 
 def add_BHLIndexServicer_to_server(servicer, server):
   rpc_method_handlers = {
@@ -54,8 +66,13 @@ def add_BHLIndexServicer_to_server(servicer, server):
       ),
       'Pages': grpc.unary_stream_rpc_method_handler(
           servicer.Pages,
-          request_deserializer=protob__pb2.WithText.FromString,
+          request_deserializer=protob__pb2.PagesOpt.FromString,
           response_serializer=protob__pb2.Page.SerializeToString,
+      ),
+      'Titles': grpc.unary_stream_rpc_method_handler(
+          servicer.Titles,
+          request_deserializer=protob__pb2.TitlesOpt.FromString,
+          response_serializer=protob__pb2.Title.SerializeToString,
       ),
   }
   generic_handler = grpc.method_handlers_generic_handler(
