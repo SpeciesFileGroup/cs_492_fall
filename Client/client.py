@@ -148,8 +148,15 @@ def run_client():
 	host = '172.22.247.23:8888'
 	with grpc.insecure_channel(host) as channel: 
 		stub = protob_pb2_grpc.BHLIndexStub(channel)
+		num_Journals = 10
+		titles = []
 		for title in Titles(stub):
-			print(title)
+			if num_Journals < 0: 
+				break 
+			titles.append(title)
+			num_Journals -= 1
+		for page in Pages(stub, withText = 1, titleIds = [x.id for x in titles]): 
+			print(page)
 		
 		# Ver(stub)
 		# Pages(stub, with_text = 1)
