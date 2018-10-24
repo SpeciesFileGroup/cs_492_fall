@@ -1,27 +1,25 @@
 from extract_data import extract_data
 import matplotlib.pyplot as plt
 import networkx as nx
-import difflib
+from networkx.readwrite import json_graph
+import difflib, json
 
-def visualize():
+def generate_graph():
 	X, y = extract_data()
 	G = nx.Graph()
 
+	X, y = X[:200], y[:200]
 	for i in range(len(X)):
-		G.add_node(X[i], num_pages = y[i])
+		G.add_node(i, journal = X[i], num_pages = y[i])
 
-	for node1 in G.nodes():
-		for node2 in G.nodes():
-			if difflib.SequenceMatcher(None, node1, node2).ratio() > 0.8:
-				G.add_edge(node1, node2)
+	for node1 in G.nodes(data=True):
+		for node2 in G.nodes(data=True):
+			if difflib.SequenceMatcher(None, node1[1]['journal'], node2[1]['journal']).ratio() > 0.8 and node1 != node2:
+				G.add_edge(node1[0], node2[0])
 
-	print(list(nx.connected_components(G)))
-	node_labels = {node: node for node in G.nodes()}
-
-	pos = nx.spring_layout(G)
-	nx.draw_networkx_nodes(G, pos, cmap = plt.get_cmap('jet'), node_size = 100)
-	nx.draw_networkx_edges(G, pos, edgelist = G.edges(), edge_color = 'black')
-	plt.show()
+	graph_data = json_graph.node_link_data(G)
+	with open('graph.json', 'w') as f:
+		json.dump(graph_data, f, indent=4)
 
 if __name__ == '__main__':
-	visualize()
+	generate_graph()
