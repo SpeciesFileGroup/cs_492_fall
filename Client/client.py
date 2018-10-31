@@ -177,9 +177,12 @@ def run_client():
 					else:
 						journal_names.append(prev_title)
 
-					ratios_v1.append(names_verified_v1/total_names)
-					ratios_v2.append(names_verified_v2/total_names)
-
+					if total_names != 0:
+						ratios_v1.append(names_verified_v1/total_names)
+						ratios_v2.append(names_verified_v2/total_names)
+					else:
+						ratios_v1.append(0)
+						ratios_v2.append(0)
 					total_names, names_verified_v1, names_verified_v2 = 0, 0, 0
 
 			for page_number in journal.pages_to_names:
