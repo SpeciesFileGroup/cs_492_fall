@@ -2,6 +2,8 @@ import os, sys, inspect
 import argparse
 import grpc 
 import re
+import difflib
+import matplotlib.pyplot as plt
 # from Topic_Model import *
 
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
@@ -90,7 +92,7 @@ def Pages(stub, withText = 1, titleIds = []):
 	first = True 
 	journal = None 
 
-	for page in pages: 
+	for page in pages:
 		if page.title_id != prev_title: 
 			if not first: # Yield what we have currently before creating a new journal 
 				yield journal 
@@ -148,16 +150,67 @@ def run_client():
 	host = '172.22.247.23:8888'
 	with grpc.insecure_channel(host) as channel: 
 		stub = protob_pb2_grpc.BHLIndexStub(channel)
-		num_Journals = 10
+		# num_Journals = 100
 		titles = []
 		for title in Titles(stub):
-			if num_Journals < 0: 
-				break 
+			# if num_Journals < 0: 
+				# break 
 			titles.append(title)
-			num_Journals -= 1
-		for page in Pages(stub, withText = 1, titleIds = [x.id for x in titles]): 
-			print(page)
-		
+			# num_Journals -= 1
+
+		total_names = 0
+		names_verified_v1, names_verified_v2 = 0, 0
+
+		prev_title = ''
+		ratios_v1, ratios_v2, journal_names = [], [], []
+		journals_seen = 0
+
+		for journal in Pages(stub, withText = 0, titleIds = [x.id for x in titles]): 
+			journals_seen += 1
+
+			if prev_title != '':
+				if difflib.SequenceMatcher(None, prev_title, journal.title).ratio() < 0.8:
+					mob = re.search('\d', prev_title)
+
+					if mob:
+						journal_names.append(prev_title[:mob.start()])
+					else:
+						journal_names.append(prev_title)
+
+					ratios_v1.append(names_verified_v1/total_names)
+					ratios_v2.append(names_verified_v2/total_names)
+
+					total_names, names_verified_v1, names_verified_v2 = 0, 0, 0
+
+			for page_number in journal.pages_to_names:
+				names_on_page = journal.pages_to_names[page_number]
+				for name in names_on_page:
+					total_names += 1
+
+					if name.match == 1 or name.match == 2 or name.match == 4:
+						names_verified_v1 += 1
+					if name.match != 0:
+						names_verified_v2 += 1
+			
+			prev_title = journal.title
+
+			if len(journal_names) == 1:
+				break
+
+		plt.xlabel('Journals')
+		plt.ylabel('Ratio of verified names to total names')
+
+		x = [i for i in range(len(journal_names))]
+		plt.plot(x, ratios_v1)
+
+		plt.xticks(x, journal_names)
+		plt.xticks(rotation = 60)
+		plt.grid(True)
+		plt.show()
+
+		print('Journals seen: ' + str(journals_seen))
+
+
 		# Ver(stub)
 		# Pages(stub, with_text = 1)
 		# doc_list = Pages(stub, with_text = 1)
@@ -170,7 +223,7 @@ def run_client():
 	tm = Topic_Model()
 	res = tm.topicModel(break_down_doc(doc_list))
 	print(res.message)
-	""" 
+	"""
 
 if __name__ == "__main__":
 	run_client()
