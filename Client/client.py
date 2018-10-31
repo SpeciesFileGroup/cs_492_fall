@@ -194,7 +194,7 @@ def run_client():
 			
 			prev_title = journal.title
 
-			if len(journal_names) == 1:
+			if len(journal_names) == 100:
 				break
 
 		plt.xlabel('Journals')
