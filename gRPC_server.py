@@ -29,7 +29,7 @@ class gRPCServer(my_service_pb2_grpc.MyServiceServicer):
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     my_service_pb2_grpc.add_MyServiceServicer_to_server(gRPCServer(), server)
-    server.add_insecure_port('[::]:5073')
+    server.add_insecure_port('[::]:5003')
     server.start()
     try:
         while True:

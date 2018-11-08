@@ -6,7 +6,7 @@ class Topic_Model():
 	global display_topics
 	def __init__(self):
 		self.documents = []
-		self.no_topics = 3
+		self.no_topics = 1
 		self.no_top_words = 5
 		self.no_features = 1000
 

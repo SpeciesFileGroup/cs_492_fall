@@ -10,12 +10,6 @@ class Topic_Model():
 		self.no_top_words = 5
 		self.no_features = 1000
 
-		# for i in range(1, 4):
-		# 	file_name = "Output" + str(i) + ".txt"
-		# 	with open(file_name, 'r') as myfile:
-		# 	    data = myfile.read().replace('\n', '')
-		# 	    documents.append(data)
-
 	def display_topics(model, feature_names, no_top_words):
 	    for topic_idx, topic in enumerate(model.components_):
 	        print ("Topic %d:" % (topic_idx))
