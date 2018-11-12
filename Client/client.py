@@ -63,7 +63,7 @@ def Pages(stub, with_text = 1):
 	doc_list = []
 	document = ""
 
-	f = open("myfile.txt", "w+")
+	# f = open("myfile.txt", "w+")
 	myset = set()
 	mydic = {}
 	record = 0
@@ -73,9 +73,13 @@ def Pages(stub, with_text = 1):
 		record += 1
 		print("Number of pages processed: " + str(record))
 		list_value = path_split(page.names)
-		print(list_value)
-		# ret = nltk_dist(page.text, path_split(page.names))
-		# print(ret)
+		# print(list_value)
+		ret = nltk_dist(page.text, path_split(page.names))
+		for ret_key in ret:
+			if ret_key not in mydic:
+				mydic.update({ret_key: ret[ret_key]})
+			else:
+				mydic[ret_key].append(ret[ret_key])
 		# for key in path_split(page.names):
 		# 	if key not in mydic:
 		# 		mydic[key] = {}
@@ -89,8 +93,8 @@ def Pages(stub, with_text = 1):
 			i  = i + 1
 			title_id = temp_title_id
 			doc_list.append(document) 
-			f.write(document)
-		if i >= 2 or record >= 10:
+			# f.write(document)
+		if i >= 2 or record >= 5:
 			break
 
 	# for i in mydic:
@@ -99,7 +103,10 @@ def Pages(stub, with_text = 1):
 	# 		ret.append((j, mydic[i][j]))
 	# 	mydic[i] = ret
 
-	f.close()
+	# f.close()
+	print(mydic)
+	with open('my_dict.json', 'w') as f:
+		json.dump(mydic, f)
 	return doc_list
 
 def run_client(): 
