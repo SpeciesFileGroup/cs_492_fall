@@ -94,7 +94,7 @@ def Pages(stub, with_text = 1):
 			title_id = temp_title_id
 			doc_list.append(document) 
 			# f.write(document)
-		if i >= 2 or record >= 5:
+		if record >= 10000:
 			break
 
 	# for i in mydic:
