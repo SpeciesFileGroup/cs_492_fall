@@ -52,7 +52,7 @@ def path_split(name_string):
 	# 		myset.update(i.path.split('|'))
 	# return myset
 	for i in name_string:
-		myset.add((i.value).decode('utf-8'))
+		myset.add((i.value).encode('utf-8'))
 	return list(myset)
 
 def Pages(stub, with_text = 1):
@@ -94,7 +94,7 @@ def Pages(stub, with_text = 1):
 		# 	title_id = temp_title_id
 			# doc_list.append(document) 
 			# f.write(document)
-		if record >= 10000:
+		if record >= 10:
 			break
 
 	# for i in mydic:
