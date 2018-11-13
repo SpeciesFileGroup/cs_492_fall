@@ -75,7 +75,7 @@ def Pages(stub, with_text = 1):
 		record += 1
 		if record % 100 == 0:
 			end = time.time()
-			print("Average processing time per page: " + str((end - start)/100) + " seconds")
+			print("Average processing time per page: " + str((end - start)/record) + " seconds")
 			print("Number of pages processed: " + str(record))
 		list_value = path_split(page.names)
 		# print(list_value)
