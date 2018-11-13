@@ -7,6 +7,7 @@ from multiprocessing import Pool
 from geo_mine import geo
 from geo_mine import nltk_mine
 from geo_mine import nltk_dist
+import time
 # from Topic_Model import *
 
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
@@ -56,6 +57,7 @@ def path_split(name_string):
 	return list(myset)
 
 def Pages(stub, with_text = 1):
+	start = time.time()
 	wt = protob_pb2.WithText(value = with_text)
 	pages = stub.Pages(wt)
 	title_id = ""
@@ -72,6 +74,8 @@ def Pages(stub, with_text = 1):
 		temp_title_id = page.title_id
 		record += 1
 		if record % 100 == 0:
+			end = time.time()
+			print("Average processing time per page: " + str((end - start)/100) + " seconds")
 			print("Number of pages processed: " + str(record))
 		list_value = path_split(page.names)
 		# print(list_value)

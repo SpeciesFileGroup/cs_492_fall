@@ -80,7 +80,7 @@ def nltk_dist(article, list_value):
 		ret.update({name: []})
 		for name_loc in [m.start() for m in re.finditer(name, article)]:
 			closet_loc = min(geo_word_loc, key=lambda x:abs(x-name_loc))
-			ret[name].append((abs(name_loc-closet_loc), str(mydic[closet_loc])))
+			ret[name].append((abs(name_loc-closet_loc), mydic[closet_loc].encode('utf-8')))
 	return ret
 
 def main():
