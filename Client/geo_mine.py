@@ -6,9 +6,12 @@ from nltk import word_tokenize, pos_tag, ne_chunk
 from nltk.tag import StanfordNERTagger
 import re
 import nltk.data
+# ner_tagger = StanfordNERTagger(
+# 	    '/mnt/c/Users/herbe/CS493/cs_492_fall/nre/classifiers/english.all.3class.distsim.crf.ser.gz',
+# 	    '/mnt/c/Users/herbe/CS493/cs_492_fall/nre/stanford-ner.jar', encoding='utf8')
 ner_tagger = StanfordNERTagger(
-	    '/mnt/c/Users/herbe/CS493/cs_492_fall/nre/classifiers/english.all.3class.distsim.crf.ser.gz',
-	    '/mnt/c/Users/herbe/CS493/cs_492_fall/nre/stanford-ner.jar', encoding='utf8')
+	    '/home/rwang67/cs_492_fall/nre/classifiers/english.all.3class.distsim.crf.ser.gz',
+	    '/home/rwang67/cs_492_fall/nre/stanford-ner.jar', encoding='utf8')
 tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
 
 def geo(textInput):

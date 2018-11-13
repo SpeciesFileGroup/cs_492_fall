@@ -52,7 +52,7 @@ def path_split(name_string):
 	# 		myset.update(i.path.split('|'))
 	# return myset
 	for i in name_string:
-		myset.add(str(i.value))
+		myset.add((i.value).decode('utf-8'))
 	return list(myset)
 
 def Pages(stub, with_text = 1):
@@ -61,7 +61,7 @@ def Pages(stub, with_text = 1):
 	title_id = ""
 	i = 0
 	doc_list = []
-	document = ""
+	# document = ""
 
 	# f = open("myfile.txt", "w+")
 	myset = set()
@@ -74,7 +74,7 @@ def Pages(stub, with_text = 1):
 		print("Number of pages processed: " + str(record))
 		list_value = path_split(page.names)
 		# print(list_value)
-		ret = nltk_dist(page.text, path_split(page.names))
+		ret = nltk_dist(page.text, list_value)
 		for ret_key in ret:
 			if ret_key not in mydic:
 				mydic.update({ret_key: ret[ret_key]})
@@ -88,11 +88,11 @@ def Pages(stub, with_text = 1):
 		# 			mydic[key][j] = 1
 		# 		else:
 		# 			mydic[key][j] += 1
-		document += page.text
-		if temp_title_id != title_id:
-			i  = i + 1
-			title_id = temp_title_id
-			doc_list.append(document) 
+		# document += page.text
+		# if temp_title_id != title_id:
+		# 	i  = i + 1
+		# 	title_id = temp_title_id
+			# doc_list.append(document) 
 			# f.write(document)
 		if record >= 10000:
 			break
