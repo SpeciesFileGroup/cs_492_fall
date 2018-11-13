@@ -71,7 +71,8 @@ def Pages(stub, with_text = 1):
 	for page in pages:
 		temp_title_id = page.title_id
 		record += 1
-		print("Number of pages processed: " + str(record))
+		if record % 100 == 0:
+			print("Number of pages processed: " + str(record))
 		list_value = path_split(page.names)
 		# print(list_value)
 		ret = nltk_dist(page.text, list_value)
@@ -94,7 +95,7 @@ def Pages(stub, with_text = 1):
 		# 	title_id = temp_title_id
 			# doc_list.append(document) 
 			# f.write(document)
-		if record >= 10:
+		if record >= 10000:
 			break
 
 	# for i in mydic:
@@ -104,7 +105,7 @@ def Pages(stub, with_text = 1):
 	# 	mydic[i] = ret
 
 	# f.close()
-	print(mydic)
+	# print(mydic)
 	with open('my_dict.json', 'w') as f:
 		json.dump(mydic, f)
 	return doc_list
