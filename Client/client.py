@@ -62,29 +62,35 @@ def Pages(stub, with_text = 1):
 	pages = stub.Pages(wt)
 	title_id = ""
 	i = 0
-	doc_list = []
+	# doc_list = []
 	# document = ""
 
 	# f = open("myfile.txt", "w+")
 	myset = set()
 	mydic = {}
 	record = 0
-	agents = 4
+	num_name_string = 0
 	for page in pages:
 		temp_title_id = page.title_id
 		record += 1
-		if record % 100 == 0:
+		if record % 500 == 0:
 			end = time.time()
-			print("Average processing time per page: " + str((end - start)/record) + " seconds")
 			print("Number of pages processed: " + str(record))
+			print("Average processing time per page: " + str((end - start)/record) + " seconds")
+			print("Total number of name string: " + str(num_name_string))
+
 		list_value = path_split(page.names)
-		# print(list_value)
+		if len(list_value) == 0:
+			continue
+		num_name_string += len(list_value)
+
 		ret = nltk_dist(page.text, list_value)
 		for ret_key in ret:
 			if ret_key not in mydic:
 				mydic.update({ret_key: ret[ret_key]})
 			else:
-				mydic[ret_key].append(ret[ret_key])
+				mydic[ret_key] += ret[ret_key]
+		
 		# for key in path_split(page.names):
 		# 	if key not in mydic:
 		# 		mydic[key] = {}
@@ -99,17 +105,11 @@ def Pages(stub, with_text = 1):
 		# 	title_id = temp_title_id
 			# doc_list.append(document) 
 			# f.write(document)
-		if record >= 10000:
+
+		if record >= 30000:
 			break
 
-	# for i in mydic:
-	# 	ret = []
-	# 	for j in (sorted(mydic[i], key=mydic[i].get, reverse=True)[:3]):
-	# 		ret.append((j, mydic[i][j]))
-	# 	mydic[i] = ret
-
 	# f.close()
-	# print(mydic)
 	with open('my_dict.json', 'w') as f:
 		json.dump(mydic, f)
 	return doc_list
