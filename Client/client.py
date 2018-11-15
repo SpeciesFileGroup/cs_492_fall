@@ -73,7 +73,7 @@ def Pages(stub, with_text = 1):
 	for page in pages:
 		temp_title_id = page.title_id
 		record += 1
-		if record % 500 == 0:
+		if record % 1 == 0:
 			end = time.time()
 			print("Number of pages processed: " + str(record))
 			print("Average processing time per page: " + str((end - start)/record) + " seconds")
@@ -84,7 +84,7 @@ def Pages(stub, with_text = 1):
 			continue
 		num_name_string += len(list_value)
 
-		ret = nltk_dist(page.text, list_value)
+		ret = nltk_dist(page.text, list_value, page.title_id)
 		for ret_key in ret:
 			if ret_key not in mydic:
 				mydic.update({ret_key: ret[ret_key]})
@@ -106,13 +106,14 @@ def Pages(stub, with_text = 1):
 			# doc_list.append(document) 
 			# f.write(document)
 
-		if record >= 30000:
+		if record >= 3:
 			break
 
 	# f.close()
+	print(mydic)
 	with open('my_dict.json', 'w') as f:
 		json.dump(mydic, f)
-	return doc_list
+	# return doc_list
 
 def run_client(): 
 	doc_list = []
