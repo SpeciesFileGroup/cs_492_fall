@@ -66,7 +66,7 @@ def retrieve_journals_from_titles(stub, withText = 0, titleIds = []):
 	journal = None 
 
 	for page in pages: 
-		page_num = page.id[page.id.find("_") + 1:] 
+		page_num = page.id[page.id.rfind("_") + 1:] 
 		if page.title_id != prev_title: 
 			if not first: # Yield what we have currently before creating a new journal 
 				yield journal 
@@ -86,7 +86,7 @@ def retrieve_journals(stub, withText = 0):
 		pagesOpt = protob_pb2.PagesOpt(with_text = withText, title_ids = [title.id])
 		journal = Journal(title.archive_id, title.id, title.path, title.lang)
 		for page in stub.Pages(pagesOpt): # A stream of Page objects 
-			page_num = page.id[page.id.find("_") + 1:] 
+			page_num = int(page.id[page.id.rfind("_") + 1:])
 			if withText == 1: 
 				journal.add_page(page_num, page.names, str(page.text))
 			else: 
@@ -108,6 +108,7 @@ def run_client():
 	host = '172.22.247.23:8888'
 	with grpc.insecure_channel(host) as channel: 
 		stub = protob_pb2_grpc.BHLIndexStub(channel)
+		""" 
 		num_Journals = 10
 		titles = []
 		for title in Titles(stub):
@@ -115,8 +116,10 @@ def run_client():
 				break 
 			titles.append(title)
 			num_Journals -= 1
+		"""
 		for journal in retrieve_journals(stub, withText = 0): 
-			print(journal.get_verified_ratio())
+			verified, seen, ratio = journal.get_verified_ratio()
+			print("Verified: {}\tSeen: {}\tRatio:{}".format(verified, seen, ratio))
 			journal.write_to_file(journalsPath)
 
 def collect_journals(filepath): 
@@ -133,12 +136,18 @@ def collect_journals(filepath):
 	with open(filepath, "r") as f: 
 		while True: 
 			name = f.readline() 
+			verified = f.readline()
+			names = f.readline() 
 			ratio = f.readline() 
 			if name == "": 
 				break 
 			name, edition = extract_journal(name)
+			verified = float(verified.strip().split()[-1])
+			names = float(names.strip().split()[-1])
 			ratio = float(ratio.strip().split()[-1])
 			journal = journalCollections.get(name, JournalCollection(name))
+			journal.edition_to_verified_names[edition] = verified
+			journal.edition_to_total_names[edition] = names
 			journal.edition_to_ratio[edition] = ratio
 			journalCollections[name] = journal
 	return journalCollections
@@ -149,14 +158,10 @@ def collect_journals(filepath):
 journalsPath = "journal_data2.log"
 collectionsPath = "journal_collections_data2.log"
 if __name__ == "__main__":
-	run_client()
-	""" 
+	# run_client()
 	journalCollections = collect_journals(journalsPath)
 	for journalCollection in journalCollections.values():
 		journalCollection.write_to_file(collectionsPath)
-	"""
-
-
 
 """
 # Old code for run_client
