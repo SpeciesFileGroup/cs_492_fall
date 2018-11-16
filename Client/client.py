@@ -65,9 +65,9 @@ def Pages(stub, with_text = 1):
 	pages = stub.Pages(wt)
 	title_id = ""
 	i = 0
-	batch_size = 8
-	max_size = 16
-	workers = 4
+	batch_size = 800
+	max_size = 1600
+	workers = 8
 	thread_load = int(batch_size / workers)
 	page_list = []
 	name_list = []
@@ -90,6 +90,7 @@ def Pages(stub, with_text = 1):
 			processes = [mp.Process(target=nltk_dist, 
 				args=(page_list[thread_load*x : thread_load*(x+1)], name_list, title_id_list)) for x in range(workers)]
 			for p in processes:
+				print("Processes Started")
 				p.start()
 
 			for p in processes:
