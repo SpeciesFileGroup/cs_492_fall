@@ -58,32 +58,45 @@ def nltk_mine(article, list_value, radius):
 		mydic[cur_value] = list(myset)
 	return mydic
 
+def path_split(name_string):
+	myset = set()
+	for i in name_string:
+		myset.add((i.value).encode('utf-8'))
+	return list(myset)
 
-def nltk_dist(article, list_value, title_id):
-	mydic = {}
-	if len(list_value) == 0 or article == '':
-		return {}
-	geo_word_loc = []
+
+def nltk_dist(page_list, name_list, title_id_list):
 	ret = {}
-	article = article.decode('utf-8').strip()
-	words = nk.word_tokenize(article)
-	try:
-		results = ner_tagger.tag(words)
-	except GeneratorExit:
-		print "Generator exiting!"
-	for result in results:
-		if result[1] == "LOCATION":
-			location = article.find(result[0])
-			geo_word_loc.append(location)
-			mydic.update({location : result[0]})
+	for i in range(len(page_list)):
+		mydic = {}
+		article = page_list[i]
+		list_value = path_split(name_list[i])
+		title_id = title_id_list[i]
 
-	if len(geo_word_loc) == 0:
-		return {}
-	for name in list_value:
-		ret.update({name: []})
-		for name_loc in [m.start() for m in re.finditer(name, article)]:
-			closet_loc = min(geo_word_loc, key=lambda x:abs(x-name_loc))
-			ret[name].append((abs(name_loc-closet_loc), mydic[closet_loc].encode('utf-8'), title_id))
+		# article, list_value, title_id
+		if len(list_value) == 0 or article == '':
+			continue
+
+		geo_word_loc = []
+		article = article.decode('utf-8').strip()
+		words = nk.word_tokenize(article)
+		try:
+			results = ner_tagger.tag(words)
+		except GeneratorExit:
+			print "Generator exiting!"
+		for result in results:
+			if result[1] == "LOCATION":
+				location = article.find(result[0])
+				geo_word_loc.append(location)
+				mydic.update({location : result[0]})  # location -> geo entity
+
+		if len(geo_word_loc) == 0:
+			continue		
+		for name in list_value:
+			ret.update({name: []})
+			for name_loc in [m.start() for m in re.finditer(name, article)]: #Find all the location that a name string appear in the page
+				closet_loc = min(geo_word_loc, key=lambda x:abs(x-name_loc))
+				ret[name].append((abs(name_loc-closet_loc), mydic[closet_loc].encode('utf-8'), title_id))
 	return ret
 
 def main():

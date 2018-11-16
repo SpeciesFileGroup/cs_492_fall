@@ -8,6 +8,8 @@ from geo_mine import geo
 from geo_mine import nltk_mine
 from geo_mine import nltk_dist
 import time
+import multiprocessing as mp
+
 # from Topic_Model import *
 
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
@@ -47,6 +49,7 @@ def Ver(stub):
 	return stub.Ver(protob_pb2.Void()).value
 
 def path_split(name_string):
+	print(name_string)
 	myset = set()
 	# for i in name_string:
 	# 	if i.path != '':
@@ -62,34 +65,48 @@ def Pages(stub, with_text = 1):
 	pages = stub.Pages(wt)
 	title_id = ""
 	i = 0
-	# doc_list = []
-	# document = ""
-
-	# f = open("myfile.txt", "w+")
-	myset = set()
+	batch_size = 8
+	max_size = 16
+	workers = 4
+	thread_load = int(batch_size / workers)
+	page_list = []
+	name_list = []
+	title_id_list = []
 	mydic = {}
 	record = 0
 	num_name_string = 0
 	for page in pages:
-		temp_title_id = page.title_id
 		record += 1
-		if record % 1 == 0:
+		# print("Number of pages processed: " + str(record))
+		# print("Average processing time per page: " + str((end - start)/record) + " seconds")
+		# print("Total number of name string: " + str(num_name_string))
+		page_list.append(page.text)
+		name_list.append(page.names)
+		title_id_list.append(page.title_id)
+		if record >= max_size:
+			break
+		if record % batch_size == 0:
+			output = mp.Queue()
+			processes = [mp.Process(target=nltk_dist, 
+				args=(page_list[thread_load*x : thread_load*(x+1)], name_list, title_id_list)) for x in range(workers)]
+			for p in processes:
+				p.start()
+
+			for p in processes:
+				p.join()
+
+			results = [output.get() for p in processes]
 			end = time.time()
-			print("Number of pages processed: " + str(record))
-			print("Average processing time per page: " + str((end - start)/record) + " seconds")
-			print("Total number of name string: " + str(num_name_string))
-
-		list_value = path_split(page.names)
-		if len(list_value) == 0:
+			print("Average processing time per page: " + str((end - start)/batch_size) + " seconds")
+			print(results)
+			# ret = nltk_dist(page_list, name_list, title_id_list)
+			# for ret_key in ret:
+			# 	if ret_key not in mydic:
+			# 		mydic.update({ret_key: ret[ret_key]})
+			# 	else:
+			# 		mydic[ret_key] += ret[ret_key]
+		else:
 			continue
-		num_name_string += len(list_value)
-
-		ret = nltk_dist(page.text, list_value, page.title_id)
-		for ret_key in ret:
-			if ret_key not in mydic:
-				mydic.update({ret_key: ret[ret_key]})
-			else:
-				mydic[ret_key] += ret[ret_key]
 		
 		# for key in path_split(page.names):
 		# 	if key not in mydic:
@@ -106,10 +123,7 @@ def Pages(stub, with_text = 1):
 			# doc_list.append(document) 
 			# f.write(document)
 
-		if record >= 3:
-			break
 
-	# f.close()
 	print(mydic)
 	with open('my_dict.json', 'w') as f:
 		json.dump(mydic, f)
