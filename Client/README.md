@@ -1,4 +1,5 @@
 client.py connects to the server and implement the RPC methods defined in protob.proto 
+
 utils.py defines useful Page/Journal/JournalCollection data structures used to organize the streamed data together 
   - Page isn't really implemented yet, get around to doing this later 
   - It would be more efficient/useful if these serialized to Json file formats instead of just writing to file line by line 
