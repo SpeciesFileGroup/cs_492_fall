@@ -5,14 +5,15 @@ from nltk.chunk import conlltags2tree, tree2conlltags
 from nltk import word_tokenize, pos_tag, ne_chunk
 from nltk.tag import StanfordNERTagger
 import re
+import spacy
 import nltk.data
-# ner_tagger = StanfordNERTagger(
-# 	    '/mnt/c/Users/herbe/CS493/cs_492_fall/nre/classifiers/english.all.3class.distsim.crf.ser.gz',
-# 	    '/mnt/c/Users/herbe/CS493/cs_492_fall/nre/stanford-ner.jar', encoding='utf8')
-
 ner_tagger = StanfordNERTagger(
-	    '/home/rwang67/cs_492_fall/nre/classifiers/english.all.3class.distsim.crf.ser.gz',
-	    '/home/rwang67/cs_492_fall/nre/stanford-ner.jar', encoding='utf8')
+	    '/mnt/c/Users/herbe/CS493/cs_492_fall/nre/classifiers/english.all.3class.distsim.crf.ser.gz',
+	    '/mnt/c/Users/herbe/CS493/cs_492_fall/nre/stanford-ner.jar', encoding='utf8')
+
+# ner_tagger = StanfordNERTagger(
+# 	    '/home/rwang67/cs_492_fall/nre/classifiers/english.all.3class.distsim.crf.ser.gz',
+# 	    '/home/rwang67/cs_492_fall/nre/stanford-ner.jar', encoding='utf8')
 
 
 tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
@@ -65,7 +66,7 @@ def path_split(name_string):
 	return list(myset)
 
 
-def nltk_dist(page_list, name_list, title_id_list):
+def nltk_dist(page_list, name_list, title_id_list, nlp, output):
 	ret = {}
 	for i in range(len(page_list)):
 		mydic = {}
@@ -77,19 +78,27 @@ def nltk_dist(page_list, name_list, title_id_list):
 		if len(list_value) == 0 or article == '':
 			continue
 
+#=========================Stanford NLTK Library =========================
+		# geo_word_loc = []
+		# article = article.decode('utf-8').strip()
+		# print(article)
+		# words = nk.word_tokenize(article)
+		# results = ner_tagger.tag(words)
+		# for result in results:
+		# 	if result[1] == "LOCATION":
+		# 		location = article.find(result[0])
+		# 		geo_word_loc.append(location)
+		# 		mydic.update({location : result[0]})  # location -> geo entity
+#=========================Spacy https://spacy.io/ =========================
 		geo_word_loc = []
 		article = article.decode('utf-8').strip()
-		words = nk.word_tokenize(article)
-		try:
-			results = ner_tagger.tag(words)
-		except GeneratorExit:
-			print "Generator exiting!"
-		for result in results:
-			if result[1] == "LOCATION":
-				location = article.find(result[0])
+		doc = nlp(article)
+		for entity in doc.ents:
+			if entity.label_ == "GPE":
+				location = article.find(entity.text)
 				geo_word_loc.append(location)
-				mydic.update({location : result[0]})  # location -> geo entity
-
+				mydic.update({location : entity.text})  # location -> geo entity
+#========================================================================
 		if len(geo_word_loc) == 0:
 			continue		
 		for name in list_value:
@@ -97,7 +106,9 @@ def nltk_dist(page_list, name_list, title_id_list):
 			for name_loc in [m.start() for m in re.finditer(name, article)]: #Find all the location that a name string appear in the page
 				closet_loc = min(geo_word_loc, key=lambda x:abs(x-name_loc))
 				ret[name].append((abs(name_loc-closet_loc), mydic[closet_loc].encode('utf-8'), title_id))
-	return ret
+	
+	output.put(ret)
+	# return ret
 
 def main():
 	# fname = "myfile.txt"

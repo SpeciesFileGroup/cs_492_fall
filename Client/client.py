@@ -8,6 +8,7 @@ from geo_mine import geo
 from geo_mine import nltk_mine
 from geo_mine import nltk_dist
 import time
+import spacy
 import multiprocessing as mp
 
 # from Topic_Model import *
@@ -65,47 +66,57 @@ def Pages(stub, with_text = 1):
 	pages = stub.Pages(wt)
 	title_id = ""
 	i = 0
+	# Batch Size for each break
 	batch_size = 800
+	# Total number of pages
 	max_size = 1600
+	# Number of threads
 	workers = 8
 	thread_load = int(batch_size / workers)
+	page_counter = 0 
 	page_list = []
 	name_list = []
 	title_id_list = []
 	mydic = {}
 	record = 0
 	num_name_string = 0
+	nlp = spacy.load('en')
 	for page in pages:
-		record += 1
-		# print("Number of pages processed: " + str(record))
-		# print("Average processing time per page: " + str((end - start)/record) + " seconds")
-		# print("Total number of name string: " + str(num_name_string))
+		page_counter += 1
+		if not list(page.names):
+			continue
 		page_list.append(page.text)
-		name_list.append(page.names)
+		name_list.append(list(page.names))
 		title_id_list.append(page.title_id)
 		if record >= max_size:
 			break
+		record += 1
 		if record % batch_size == 0:
 			output = mp.Queue()
 			processes = [mp.Process(target=nltk_dist, 
-				args=(page_list[thread_load*x : thread_load*(x+1)], name_list, title_id_list)) for x in range(workers)]
+				args=(page_list[thread_load*x : thread_load*(x+1)], \
+					  name_list[thread_load*x : thread_load*(x+1)], \
+				  title_id_list[thread_load*x : thread_load*(x+1)], nlp, output)) for x in range(workers)]
+
 			for p in processes:
-				print("Processes Started")
 				p.start()
 
 			for p in processes:
 				p.join()
 
 			results = [output.get() for p in processes]
+			page_list = []
+			name_list = []
+			title_id_list = []
 			end = time.time()
-			print("Average processing time per page: " + str((end - start)/batch_size) + " seconds")
-			print(results)
-			# ret = nltk_dist(page_list, name_list, title_id_list)
-			# for ret_key in ret:
-			# 	if ret_key not in mydic:
-			# 		mydic.update({ret_key: ret[ret_key]})
-			# 	else:
-			# 		mydic[ret_key] += ret[ret_key]
+			print("Average processing time per page: " + str((end - start)/page_counter) + " seconds")
+			print("Number of pages processed: " + str(page_counter))
+			for res in results:
+				for ret_key in res:
+					if ret_key not in mydic:
+						mydic.update({ret_key: res[ret_key]})
+					else:
+						mydic[ret_key] += res[ret_key]
 		else:
 			continue
 		
@@ -123,9 +134,6 @@ def Pages(stub, with_text = 1):
 		# 	title_id = temp_title_id
 			# doc_list.append(document) 
 			# f.write(document)
-
-
-	print(mydic)
 	with open('my_dict.json', 'w') as f:
 		json.dump(mydic, f)
 	# return doc_list
