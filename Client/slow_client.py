@@ -1,3 +1,12 @@
+#title           :client.py
+#author          :Herbert Wang
+#date            :20181120
+#notes           : Single-thread version
+#usage           :python client.py
+#python_version  :Python 2.7.15rc1
+#==============================================================================
+
+
 import os, sys, inspect
 import argparse
 import grpc

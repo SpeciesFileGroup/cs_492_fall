@@ -1,3 +1,11 @@
+#title           :client.py
+#author          :Herbert Wang
+#date            :20181120
+#notes           :Muti-threads version
+#usage           :python client.py
+#python_version  :Python 2.7.15rc1
+#==============================================================================
+
 import os, sys, inspect
 import argparse
 import grpc
@@ -13,6 +21,7 @@ import multiprocessing as mp
 
 # from Topic_Model import *
 
+# adding dirtory that contains Protobuf
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0, parentdir)
@@ -30,6 +39,7 @@ class Topic_Model():
         channel = grpc.insecure_channel('localhost:5003')
         self.stub = my_service_pb2_grpc.MyServiceStub(channel)
 
+     # function that stream the pages to another grpc server for topic model processing processing
     def topicModel(self, req):
     	print("Client function: topicModel() start executing:")
     	# return self.stub.topicModel(my_service_pb2.QueryRequest(page="test"))
@@ -41,6 +51,7 @@ def break_down_doc(doc_list):
         reqs.append(my_service_pb2.QueryRequest(page=doc))
     for req in reqs:
         yield req
+
 def myprint(input):
 	print(divider)
 	print(input)
@@ -49,13 +60,9 @@ def myprint(input):
 def Ver(stub): 
 	return stub.Ver(protob_pb2.Void()).value
 
+# given a page.name, i.e, a page that contains names, extract all the name string from it
 def path_split(name_string):
-	print(name_string)
 	myset = set()
-	# for i in name_string:
-	# 	if i.path != '':
-	# 		myset.update(i.path.split('|'))
-	# return myset
 	for i in name_string:
 		myset.add((i.value).encode('utf-8'))
 	return list(myset)
@@ -67,30 +74,39 @@ def Pages(stub, with_text = 1):
 	title_id = ""
 	i = 0
 	# Batch Size for each break
-	batch_size = 1000
+	batch_size = 2400
 	# Total number of pages
-	max_size = 8000
+	max_size = 12000
 	# Number of threads
-	workers = 10
+	workers = 6
+	# NUmber of pages each threads need to process on each batch
 	thread_load = int(batch_size / workers)
 	page_counter = 0 
 	page_list = []
 	name_list = []
 	title_id_list = []
+	# Final dictionary that will be dumped into a JSON file, contains 
+	# "Name String": [[<Character distance from its closest name string on a page>, <corresponding geo entity string>, <page title>]]
 	mydic = {}
+	# keep track the total number of page processed
 	record = 0
 	num_name_string = 0
+	# initilize spacy library, english
 	nlp = spacy.load('en')
 	for page in pages:
 		page_counter += 1
 		if not list(page.names):
 			continue
+		# batch size number of pages
 		page_list.append(page.text)
+		# batch size number of name string
 		name_list.append(list(page.names))
+		# batch size number of title IDs
 		title_id_list.append(page.title_id)
 		if record >= max_size:
 			break
 		record += 1
+		# Stream upto number of batch size pages and run page processing at once.
 		if record % batch_size == 0:
 			output = mp.Queue()
 			processes = [mp.Process(target=nltk_dist, 

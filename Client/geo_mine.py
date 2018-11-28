@@ -1,3 +1,10 @@
+#title           :geo_mine.py
+#author          :Herbert Wang
+#date            :20181120
+#usage           :Called from client.py, for debuggin: python geo_mine.py
+#python_version  :Python 2.7.15rc1
+#==============================================================================
+
 import os
 import collections
 import nltk as nk
@@ -7,16 +14,19 @@ from nltk.tag import StanfordNERTagger
 import re
 import spacy
 import nltk.data
-# ner_tagger = StanfordNERTagger(
-# 	    '/mnt/c/Users/herbe/CS493/cs_492_fall/nre/classifiers/english.all.3class.distsim.crf.ser.gz',
-# 	    '/mnt/c/Users/herbe/CS493/cs_492_fall/nre/stanford-ner.jar', encoding='utf8')
-
+# for local testing, put the ner.jar and .gz file path here
 ner_tagger = StanfordNERTagger(
-	    '/home/rwang67/cs_492_fall/nre/classifiers/english.all.3class.distsim.crf.ser.gz',
-	    '/home/rwang67/cs_492_fall/nre/stanford-ner.jar', encoding='utf8')
+	    '/mnt/c/Users/herbe/CS493/cs_492_fall/nre/classifiers/english.all.3class.distsim.crf.ser.gz',
+	    '/mnt/c/Users/herbe/CS493/cs_492_fall/nre/stanford-ner.jar', encoding='utf8')
+
+## for running on remote server
+# ner_tagger = StanfordNERTagger(
+# 	    '/home/rwang67/cs_492_fall/nre/classifiers/english.all.3class.distsim.crf.ser.gz',
+# 	    '/home/rwang67/cs_492_fall/nre/stanford-ner.jar', encoding='utf8')
 
 
 tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
+
 
 def geo(textInput):
 	file_input = re.sub(r'[^\x00-\x7F]+',' ', textInput)
@@ -31,6 +41,9 @@ def geo(textInput):
 
 	return list(myset)
 
+# Tokelize the page into sentences and find geo entity that is radius of "sentence" away instead of number of character away
+# This is slower than distance by character
+# Using Stanford NLTK library
 def nltk_mine(article, list_value, radius):
 	mydic = {}
 	article = str(article)
@@ -59,13 +72,16 @@ def nltk_mine(article, list_value, radius):
 		mydic[cur_value] = list(myset)
 	return mydic
 
+# given a page.name, i.e, a page that contains names, extract all the name string from it
 def path_split(name_string):
 	myset = set()
 	for i in name_string:
 		myset.add((i.value).encode('utf-8'))
 	return list(myset)
 
-
+# Tokelize the page into sentences and find geo entity that is radius of "characters" away instead of number of senetence away
+# This is faster than distance by character
+# Using either Stanford NLTK library or Spacy library
 def nltk_dist(page_list, name_list, title_id_list, nlp, output):
 	ret = {}
 	for i in range(len(page_list)):
@@ -110,6 +126,8 @@ def nltk_dist(page_list, name_list, title_id_list, nlp, output):
 	output.put(ret)
 	# return ret
 
+
+# Main function here for debugging purpose only
 def main():
 	# fname = "myfile.txt"
 	# lines = [line.rstrip('\n') for line in open(fname)]
@@ -143,59 +161,3 @@ def main():
 
 if __name__ == "__main__":
 	main()
-
-# import os
-# import collections
-# import nltk as nk
-# from nltk.chunk import conlltags2tree, tree2conlltags
-# from nltk import word_tokenize, pos_tag, ne_chunk
-# import re
-# def main():
-# 	sentence = "Mark and John are working at Google in China."
-# 	fname = "myfile.txt"
-# 	lines = [line.rstrip('\n') for line in open(fname)]
-# 	file_input = ' '.join(lines)
-# 	file_input = re.sub(r'[^\x00-\x7F]+',' ', file_input)
-# 	ne_tree = nk.ne_chunk(nk.pos_tag(nk.word_tokenize(file_input)))
-# 	# ne_tree = nk.ne_chunk(nk.pos_tag(nk.word_tokenize(sentence)))
-	
-# 	iob_tagged = tree2conlltags(ne_tree)
-
-# 	for i in iob_tagged:
-# 		if(i[2] == 'B-GPE'):
-# 			print(i[0])
-
-
-# 	ner_tags = collections.Counter()
-# 	corpus_root = "myfile.txt"   # Make sure you set the proper path to the unzipped corpus
-	 
-# 	for root, dirs, files in os.walk(	):
-# 		print("why")
-# 		for filename in files:
-# 			if filename.endswith(".tags"):
-# 			    with open(os.path.join(root, filename), 'rb') as file_handle:
-# 			        file_content = file_handle.read().decode('utf-8').strip()
-# 			        annotated_sentences = file_content.split('\n\n')   # Split sentences
-# 			        for annotated_sentence in annotated_sentences:
-# 			            annotated_tokens = [seq for seq in annotated_sentence.split('\n') if seq]  # Split words
-
-# 			            standard_form_tokens = []
-
-# 			            for idx, annotated_token in enumerate(annotated_tokens):
-# 			                annotations = annotated_token.split('\t')   # Split annotations
-# 			                word, tag, ner = annotations[0], annotations[1], annotations[3]
-
-# 			                ner_tags[ner] += 1
-	 
-# 	print (ner_tags)
-
-
-# if __name__ == "__main__":
-# 	main()
-
-
-
-
-
-
-

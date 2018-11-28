@@ -1,3 +1,9 @@
+#title           :Topic_Model.py
+#author          :Herbert Wang
+#date            :20181101
+#usage           :Called from server.py, used when client stream pages to server, server run topic modeling and streams back the result
+#python_version  :Python 2.7.15rc1
+#==============================================================================
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.datasets import fetch_20newsgroups
 from sklearn.decomposition import NMF, LatentDirichletAllocation
@@ -35,6 +41,7 @@ class Topic_Model():
 		self.no_top_words = no_top_words
 		self.documents = documents
 
+	# TF-IDF
 	def tf_idf(self):
 		# NMF is able to use tf-idf
 		tfidf_vectorizer = TfidfVectorizer(max_df=0.95, min_df=2, max_features=self.no_features, stop_words='english')
@@ -44,6 +51,7 @@ class Topic_Model():
 		nmf = NMF(n_components=self.no_topics, random_state=1, alpha=.1, l1_ratio=.5, init='nndsvd').fit(tfidf)
 		return display_topics(nmf, tfidf_feature_names, self.no_top_words)
 
+	# Latent Dirichlet allocations
 	def lda(self):
 		# LDA can only use raw term counts for LDA because it is a probabilistic graphical model
 		tf_vectorizer = CountVectorizer(max_df=0.95, min_df=2, max_features=self.no_features, stop_words='english')
