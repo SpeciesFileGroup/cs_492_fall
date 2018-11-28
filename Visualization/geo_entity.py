@@ -48,7 +48,7 @@ def main():
 	sorted_country_frequency = sorted(country_frequency.items(), key = lambda item: item[1], reverse = True)
 	print(sorted_country_frequency)
 
-	sorted_cityy_frequency = sorted(city_frequency.items(), key = lambda item: item[1], reverse = True)
+	sorted_city_frequency = sorted(city_frequency.items(), key = lambda item: item[1], reverse = True)
 	print(sorted_city_frequency)
 
 if __name__ == '__main__':
