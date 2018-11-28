@@ -74,9 +74,9 @@ def Pages(stub, with_text = 1):
 	title_id = ""
 	i = 0
 	# Batch Size for each break
-	batch_size = 2400
+	batch_size = 600
 	# Total number of pages
-	max_size = 12000
+	max_size = 9600
 	# Number of threads
 	workers = 6
 	# NUmber of pages each threads need to process on each batch
