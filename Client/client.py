@@ -74,7 +74,7 @@ def Pages(stub, with_text = 1):
 	title_id = ""
 	i = 0
 	# Batch Size for each break
-	batch_size = 200
+	batch_size = 320
 	# Total number of pages
 	max_size = 6400
 	# Number of threads
@@ -87,7 +87,9 @@ def Pages(stub, with_text = 1):
 	title_id_list = []
 	# Final dictionary that will be dumped into a JSON file, contains 
 	# "Name String": [[<Character distance from its closest name string on a page>, <corresponding geo entity string>, <page title>]]
-	mydic = {}
+	# mydic = {}
+	# To increase performance, use a list of quadruplets instead of key value pairs
+	quadruplet_list = []
 	# keep track the total number of page processed
 	record = 0
 	num_name_string = 0
@@ -127,12 +129,14 @@ def Pages(stub, with_text = 1):
 			end = time.time()
 			print("Average processing time per page: " + str((end - start)/page_counter) + " seconds")
 			print("Number of pages processed: " + str(page_counter))
+			# for res in results:
+			# 	for ret_key in res:
+			# 		if ret_key not in mydic:
+			# 			mydic.update({ret_key: res[ret_key]})
+			# 		else:
+			# 			mydic[ret_key] += res[ret_key]
 			for res in results:
-				for ret_key in res:
-					if ret_key not in mydic:
-						mydic.update({ret_key: res[ret_key]})
-					else:
-						mydic[ret_key] += res[ret_key]
+				quadruplet_list.append(res)
 		else:
 			continue
 		
@@ -150,9 +154,11 @@ def Pages(stub, with_text = 1):
 		# 	title_id = temp_title_id
 			# doc_list.append(document) 
 			# f.write(document)
-	with open('my_dict.json', 'w') as f:
-		json.dump(mydic, f)
-	# return doc_list
+	# with open('my_dict.json', 'w') as f:
+	# 	json.dump(mydic, f)
+
+	with open('pair_list.json', 'w') as f:
+		json.dump(quadruplet_list, f)
 
 def run_client(): 
 	doc_list = []

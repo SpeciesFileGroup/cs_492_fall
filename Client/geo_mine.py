@@ -15,14 +15,14 @@ import re
 import spacy
 import nltk.data
 # for local testing, put the ner.jar and .gz file path here
-ner_tagger = StanfordNERTagger(
-	    '/mnt/c/Users/herbe/CS493/cs_492_fall/nre/classifiers/english.all.3class.distsim.crf.ser.gz',
-	    '/mnt/c/Users/herbe/CS493/cs_492_fall/nre/stanford-ner.jar', encoding='utf8')
+# ner_tagger = StanfordNERTagger(
+# 	    '/mnt/c/Users/herbe/CS493/cs_492_fall/nre/classifiers/english.all.3class.distsim.crf.ser.gz',
+# 	    '/mnt/c/Users/herbe/CS493/cs_492_fall/nre/stanford-ner.jar', encoding='utf8')
 
 ## for running on remote server
-# ner_tagger = StanfordNERTagger(
-# 	    '/home/rwang67/cs_492_fall/nre/classifiers/english.all.3class.distsim.crf.ser.gz',
-# 	    '/home/rwang67/cs_492_fall/nre/stanford-ner.jar', encoding='utf8')
+ner_tagger = StanfordNERTagger(
+	    '/home/rwang67/cs_492_fall/nre/classifiers/english.all.3class.distsim.crf.ser.gz',
+	    '/home/rwang67/cs_492_fall/nre/stanford-ner.jar', encoding='utf8')
 
 
 tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
@@ -84,6 +84,7 @@ def path_split(name_string):
 # Using either Stanford NLTK library or Spacy library
 def nltk_dist(page_list, name_list, title_id_list, nlp, output):
 	ret = {}
+	quadruple = []
 	for i in range(len(page_list)):
 		mydic = {}
 		article = page_list[i]
@@ -118,13 +119,14 @@ def nltk_dist(page_list, name_list, title_id_list, nlp, output):
 		if len(geo_word_loc) == 0:
 			continue		
 		for name in list_value:
-			ret.update({name: []})
+			# ret.update({name: []})
 			for name_loc in [m.start() for m in re.finditer(name, article)]: #Find all the location that a name string appear in the page
 				closet_loc = min(geo_word_loc, key=lambda x:abs(x-name_loc))
-				ret[name].append((abs(name_loc-closet_loc), mydic[closet_loc].encode('utf-8'), title_id))
+				quadruple.append((name, abs(name_loc-closet_loc), mydic[closet_loc].encode('utf-8'), title_id))
+				# ret[name].append((abs(name_loc-closet_loc), mydic[closet_loc].encode('utf-8'), title_id))
 	
-	output.put(ret)
-	# return ret
+	# output.put(ret)
+	output.put(quadruple)
 
 
 # Main function here for debugging purpose only
