@@ -127,6 +127,7 @@ def nltk_dist(page_list, name_list, title_id_list, nlp, output):
 	
 	# output.put(ret)
 	output.put(quadruple)
+	return
 
 
 # Main function here for debugging purpose only

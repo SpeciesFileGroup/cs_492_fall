@@ -74,9 +74,9 @@ def Pages(stub, with_text = 1):
 	title_id = ""
 	i = 0
 	# Batch Size for each break
-	batch_size = 320
+	batch_size = 400
 	# Total number of pages
-	max_size = 6400
+	max_size = 8000
 	# Number of threads
 	workers = 4
 	# NUmber of pages each threads need to process on each batch
@@ -95,6 +95,9 @@ def Pages(stub, with_text = 1):
 	num_name_string = 0
 	# initilize spacy library, english
 	nlp = spacy.load('en')
+	output = mp.Queue()
+	# Sometime process does not join automatically, needs time_out to join child process
+	wait_bound = 0.09 * thread_load
 	for page in pages:
 		page_counter += 1
 		if not list(page.names):
@@ -105,22 +108,21 @@ def Pages(stub, with_text = 1):
 		name_list.append(list(page.names))
 		# batch size number of title IDs
 		title_id_list.append(page.title_id)
-		if record >= max_size:
-			break
 		record += 1
 		# Stream upto number of batch size pages and run page processing at once.
 		if record % batch_size == 0:
-			output = mp.Queue()
 			processes = [mp.Process(target=nltk_dist, 
 				args=(page_list[thread_load*x : thread_load*(x+1)], \
 					  name_list[thread_load*x : thread_load*(x+1)], \
 				  title_id_list[thread_load*x : thread_load*(x+1)], nlp, output)) for x in range(workers)]
 
 			for p in processes:
+				print("start")
 				p.start()
 
 			for p in processes:
-				p.join()
+				p.join(wait_bound)
+				print("join")
 
 			results = [output.get() for p in processes]
 			page_list = []
@@ -129,14 +131,21 @@ def Pages(stub, with_text = 1):
 			end = time.time()
 			print("Average processing time per page: " + str((end - start)/page_counter) + " seconds")
 			print("Number of pages processed: " + str(page_counter))
+			wait_bound = ((end - start)/record) * thread_load
+			print(wait_bound)
+			#================Dump into dictionary================
 			# for res in results:
 			# 	for ret_key in res:
 			# 		if ret_key not in mydic:
 			# 			mydic.update({ret_key: res[ret_key]})
 			# 		else:
 			# 			mydic[ret_key] += res[ret_key]
+			#================Dump into List================
 			for res in results:
-				quadruplet_list.append(res)
+				quadruplet_list.extend(res)
+			if record >= max_size:
+				break
+
 		else:
 			continue
 		
