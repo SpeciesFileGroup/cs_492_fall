@@ -74,11 +74,11 @@ def Pages(stub, with_text = 1):
 	title_id = ""
 	i = 0
 	# Batch Size for each break
-	batch_size = 400
+	batch_size = 480
 	# Total number of pages
-	max_size = 8000
+	max_size = 24000
 	# Number of threads
-	workers = 4
+	workers = 6
 	# NUmber of pages each threads need to process on each batch
 	thread_load = int(batch_size / workers)
 	page_counter = 0 
@@ -117,12 +117,10 @@ def Pages(stub, with_text = 1):
 				  title_id_list[thread_load*x : thread_load*(x+1)], nlp, output)) for x in range(workers)]
 
 			for p in processes:
-				print("start")
 				p.start()
 
 			for p in processes:
 				p.join(wait_bound)
-				print("join")
 
 			results = [output.get() for p in processes]
 			page_list = []
@@ -132,7 +130,6 @@ def Pages(stub, with_text = 1):
 			print("Average processing time per page: " + str((end - start)/page_counter) + " seconds")
 			print("Number of pages processed: " + str(page_counter))
 			wait_bound = ((end - start)/record) * thread_load
-			print(wait_bound)
 			#================Dump into dictionary================
 			# for res in results:
 			# 	for ret_key in res:
