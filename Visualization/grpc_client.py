@@ -26,6 +26,8 @@ def Pages(stub, withText = False, titles = []):
     pages = stub.Pages(pagesOpt) # A stream of Pages 
 
     for page in pages: 
+        yield page 
+        """ 
         if not withText: 
             yield page 
         else: # Decoding from bytes to string 
@@ -35,6 +37,7 @@ def Pages(stub, withText = False, titles = []):
             text = text.decode("ascii", "ignore")
             page.text = text 
             yield page
+        """ 
 
 def Titles(stub): 
     """ Implements the Titles RPC service. Streams Title objects back to the caller. Each Title object carries information about a single Journal """ 
