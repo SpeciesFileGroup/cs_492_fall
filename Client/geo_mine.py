@@ -4,6 +4,12 @@
 #usage           :Called from client.py, for debuggin: python geo_mine.py
 #python_version  :Python 2.7.15rc1
 #==============================================================================
+# I originally used the Stanford nltk library and later switched to SpaCy library. 
+# Pro (SpaCy): 1. No generator warning. Sometimes if the process exit too early, nltk tagger will split out generator warning and it is kind of annoying. 
+# 2. Speed wise, SpaCy is faster than nltk library as nltk has to start the generator and exit it every time it is invoked.
+# 3. From what I observe, SpaCy is more accurate than nltk, and the geo entity names generated from spaCy make more sense. 
+#==============================================================================
+
 
 import os
 import collections
