@@ -1,13 +1,16 @@
-client.py connects to the server and implement the RPC methods defined in protob.proto 
 
-utils.py defines useful Page/Journal/JournalCollection data structures used to organize the streamed data together 
-  - Page isn't really implemented yet, get around to doing this later 
-  - It would be more efficient/useful if these serialized to Json file formats instead of just writing to file line by line 
 
-The data generated and used for visualization has been stored in journal_data.log, journal_data2.log, journal_collections_data.log, 
-journal_collections_data2.log 
+## Folder structure
+The repo has been organized into code, data and Protobuf folders. 
 
-There are two jupyter notebooks that read the data files and convert them into interactive heatmaps. Generally refer to the second one.
-The first one basically does the same thing, but less elegantly. 
+- The code contains the python notebooks used to generate the visuazliations as well the client and utils files to connect to the gRPC server and implement the RPC Methods defined in the proto file within the Protobuf folder.
+- The data folder contains geo_entity_data which has been processed into data for countries and cities separately, which are used for the geo-entity visualziations. It also contains journal and journal collection data used for generating the verification ratio heatmaps and langauge data for the language heatmap.
+- The protobuf folder contains a single .proto file on which our case is based.
 
-The resulting heatmaps can be found in the two html files
+## Setting up environment
+
+
+## Running the code
+Run jupyter notebook in a terminal, and you should be able to execute all 3 iPython notebooks (they all pull data from files in the data folder)
+
+
