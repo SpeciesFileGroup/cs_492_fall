@@ -5,3 +5,6 @@ matplotlib==3.0.0
 protobuf==3.6.1
 grpc==0.3-19
 nltk==3.4
+bokeh==1.0.1
+googleapis-common-protos==1.5.3
+pandas==0.23.4
