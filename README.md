@@ -8,7 +8,7 @@ The repo has been organized into code, data and Protobuf folders.
 - The protobuf folder contains a single .proto file on which our case is based.
 
 ## Setting up environment
-
+There is a requirements.txt file, doing a direct ```pip -r install requirements.txt``` should be sufficient. 
 
 ## Running the code
 Run jupyter notebook in a terminal, and you should be able to execute all 3 iPython notebooks (they all pull data from files in the data folder)
