@@ -4,6 +4,8 @@
 #usage           :Called from server.py, used when client stream pages to server, server run topic modeling and streams back the result
 #python_version  :Python 2.7.15rc1
 #==============================================================================
+# Source: https://towardsdatascience.com/topic-modeling-and-latent-dirichlet-allocation-in-python-9bf156893c24
+# Source: https://medium.com/mlreview/topic-modeling-with-scikit-learn-e80d33668730
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.datasets import fetch_20newsgroups
 from sklearn.decomposition import NMF, LatentDirichletAllocation

@@ -21,14 +21,14 @@ import re
 import spacy
 import nltk.data
 # for local testing, put the ner.jar and .gz file path here
-# ner_tagger = StanfordNERTagger(
-# 	    '/mnt/c/Users/herbe/CS493/cs_492_fall/nre/classifiers/english.all.3class.distsim.crf.ser.gz',
-# 	    '/mnt/c/Users/herbe/CS493/cs_492_fall/nre/stanford-ner.jar', encoding='utf8')
+ner_tagger = StanfordNERTagger(
+	    '/mnt/c/Users/herbe/CS493/cs_492_fall/nre/classifiers/english.all.3class.distsim.crf.ser.gz',
+	    '/mnt/c/Users/herbe/CS493/cs_492_fall/nre/stanford-ner.jar', encoding='utf8')
 
 ## for running on remote server
-ner_tagger = StanfordNERTagger(
-	    '/home/rwang67/cs_492_fall/nre/classifiers/english.all.3class.distsim.crf.ser.gz',
-	    '/home/rwang67/cs_492_fall/nre/stanford-ner.jar', encoding='utf8')
+# ner_tagger = StanfordNERTagger(
+# 	    '/home/rwang67/cs_492_fall/nre/classifiers/english.all.3class.distsim.crf.ser.gz',
+# 	    '/home/rwang67/cs_492_fall/nre/stanford-ner.jar', encoding='utf8')
 
 
 tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')

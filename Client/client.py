@@ -5,7 +5,17 @@
 #usage           :python client.py
 #python_version  :Python 2.7.15rc1
 #==============================================================================
+# NOTE: The following files has revised code from the following source, including 
+# client.py, geo_mine.py, Topic_Model.py
 
+# Source: https://grpc.io/docs/quickstart/python.html
+# Source: https://towardsdatascience.com/named-entity-recognition-with-nltk-and-spacy-8c4a7d88e7da
+# Source: https://docs.python.org/2/library/multiprocessing.html
+# Source: https://sebastianraschka.com/Articles/2014_multiprocessing.html
+# Source: https://spacy.io/; https://spacy.io/usage/linguistic-features
+# Source: https://medium.com/mlreview/topic-modeling-with-scikit-learn-e80d33668730
+
+#==============================================================================
 import os, sys, inspect
 import argparse
 import grpc
@@ -167,6 +177,7 @@ def Pages(stub, with_text = 1):
 		json.dump(quadruplet_list, f)
 
 def run_client(): 
+	print("Starting...")
 	doc_list = []
 	host = '172.22.247.23:8888'
 	with grpc.insecure_channel(host) as channel: 
@@ -176,9 +187,7 @@ def run_client():
 		doc_list = Pages(stub, with_text = 1)
 
 	print("Documents recieved from " + host)
-	# tm = Topic_Model()
-	# res = tm.topicModel(break_down_doc(doc_list))
-	# print(res.message)
+
 
 if __name__ == "__main__":
 	run_client()
